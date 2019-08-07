@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -6,15 +6,13 @@ inherit gnome2 meson
 
 DESCRIPTION="A quick previewer for Nautilus, the GNOME file manager"
 HOMEPAGE="https://git.gnome.org/browse/sushi"
+SRC_URI="https://download.gnome.org/sources/sushi/3.33/sushi-${PV}.tar.xz"
 
 LICENSE="GPL-2+"
 SLOT="0"
 KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc x86"
 IUSE="office"
 
-# Optional app-office/unoconv support (OOo to pdf)
-# freetype needed for font loader
-# gtk+[X] optionally needed for sushi_create_foreign_window(); when wayland is more widespread, might want to not force it
 COMMON_DEPEND="
 	>=x11-libs/gdk-pixbuf-2.23[introspection]
 	>=dev-libs/gjs-1.40
@@ -41,5 +39,15 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 RDEPEND="${COMMON_DEPEND}
-	>=gnome-base/nautilus-3.1.90
+	>=gnome-base/nautilus-3.30.0
 "
+
+src_prepare() {
+	sed -i -e "s/meson.add_install_script('meson-post-install.py', libexecdir, bindir)//" "${S}"/meson.build || die "sed failed"
+	default
+}
+
+pkg_postinst() {
+	addwrite /usr/bin/sushi
+	ln -s -f /usr/libexec/org.gnome.NautilusPreviewer /usr/bin/sushi
+}

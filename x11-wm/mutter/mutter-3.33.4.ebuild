@@ -10,9 +10,9 @@ HOMEPAGE="https://git.gnome.org/browse/mutter/"
 LICENSE="GPL-2+"
 SLOT="0"
 
-IUSE="+gles2 input_devices_wacom +introspection udev wayland"
+IUSE="elogind +gles2 input_devices_wacom +introspection systemd udev wayland"
 
-KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 # libXi-1.7.4 or newer needed per:
 # https://bugzilla.gnome.org/show_bug.cgi?id=738944
@@ -24,13 +24,14 @@ COMMON_DEPEND="
 	>=x11-libs/pango-1.30[introspection?]
 	>=x11-libs/cairo-1.14[X]
 	>=x11-libs/gtk+-3.19.8:3[X,introspection?]
-	>=dev-libs/glib-2.53.4:2[dbus]
+	>=dev-libs/glib-2.60.0:2[dbus]
 	>=media-libs/libcanberra-0.26[gtk3]
 	>=x11-libs/startup-notification-0.7
 	>=x11-libs/libXcomposite-0.2
 	>=gnome-base/gsettings-desktop-schemas-3.21.4[introspection?]
 	gnome-base/gnome-desktop:3=
 	>sys-power/upower-0.99:=
+	>=dev-util/sysprof-3.33.3
 
 	x11-libs/libICE
 	x11-libs/libSM
@@ -59,7 +60,8 @@ COMMON_DEPEND="
 	>=dev-libs/wayland-1.6.90
 	>=dev-libs/wayland-protocols-1.16
 	>=media-libs/mesa-10.3[egl,gbm,wayland]
-	sys-apps/systemd:=
+	systemd? ( sys-apps/systemd:= )
+	elogind? ( sys-auth/elogind )
 	>=virtual/libudev-232:=
 	x11-base/xorg-server[wayland]
 	x11-libs/libdrm:=
@@ -83,6 +85,8 @@ meson_use_enable() {
 }
 
 src_configure() {
+	sed -i "/'-Werror=redundant-decls',/d" "${S}"/meson.build || die "sed failed"
+
 	local emesonargs=(
 		-Dopengl=true
 		-Degl=true

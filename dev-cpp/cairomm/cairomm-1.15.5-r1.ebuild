@@ -10,7 +10,7 @@ HOMEPAGE="https://cairographics.org/cairomm/"
 SRC_URI="https://cairographics.org/releases/${P}.tar.gz"
 
 LICENSE="LGPL-2+"
-SLOT="0"
+SLOT="1.16"
 KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ppc ppc64 ~sh sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
 IUSE="aqua doc +svg X"
 

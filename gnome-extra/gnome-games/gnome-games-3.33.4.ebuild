@@ -17,7 +17,7 @@ KEYWORDS="amd64 ~x86"
 
 COMMON_DEPEND="
 	gnome-base/gnome-desktop:3=
-	>=dev-libs/libhandy-0.0.8
+	>=dev-libs/libhandy-0.0.10
 	>=sys-libs/libmanette-0.2.0
 	>=sys-libs/retro-gtk-0.13.2
 "

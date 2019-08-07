@@ -59,12 +59,12 @@ DEPEND="${RDEPEND}
 # python depending package, which can be buildtime depended in packages that
 # need these tools, without pulling in python at runtime.
 RDEPEND="${RDEPEND}
+	${PYTHON_DEPS}
 	=dev-util/glib-utils-${PV}"
 PDEPEND="
 	dbus? ( gnome-base/dconf )
 	mime? ( x11-misc/shared-mime-info )
 "
-
 # shared-mime-info needed for gio/xdgmime, bug #409481
 # dconf is needed to be able to save settings, bug #498436
 
@@ -104,13 +104,6 @@ multilib_src_configure() {
 	)
 
 	meson_src_configure
-
-	if multilib_is_native_abi; then
-		local d
-		for d in glib gio gobject; do
-			ln -s "${S}"/docs/reference/${d}/html docs/reference/${d}/html || die
-		done
-	fi
 }
 
 multilib_src_compile() {
@@ -118,6 +111,11 @@ multilib_src_compile() {
 }
 
 multilib_src_install() {
+	if multilib_is_native_abi; then
+		python_fix_shebang gobject/glib-genmarshal
+		python_fix_shebang gobject/glib-mkenums
+		python_fix_shebang glib/gtester-report
+	fi
 	meson_src_install
 }
 
