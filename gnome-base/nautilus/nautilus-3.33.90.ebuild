@@ -11,7 +11,7 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Nautilus"
 
 LICENSE="GPL-2+ LGPL-2+ FDL-1.1"
 SLOT="0"
-IUSE="exif gnome packagekit +previewer selinux sendto tracker introspection xmp doc"
+IUSE="exif gnome packagekit +previewer selinux sendto tracker introspection xmp doc debug"
 
 KEYWORDS="~alpha amd64 ~arm64 ~ia64 ~ppc ~ppc64 ~x86 ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux"
 
@@ -65,10 +65,6 @@ PDEPEND="
 # Need gvfs[gtk] for recent:/// support
 MESON_BUILD_DIR="${WORKDIR}/${P}_mesonbuild"
 
-PATCHES=(
-    "${FILESDIR}/thumbnailer.patch"
-)
-
 src_prepare() {
 	if use previewer; then
 		DOC_CONTENTS="nautilus uses gnome-extra/sushi to preview media files.
@@ -81,7 +77,7 @@ src_prepare() {
 
 src_configure() {
 	local emesonargs=(
-		--buildtype=plain
+		$(usex debug --buildtype=debug --buildtype=plain)
 		--libdir="$(get_libdir)"
 		--localstatedir="${EPREFIX}/var"
 		--prefix="${EPREFIX}/usr"

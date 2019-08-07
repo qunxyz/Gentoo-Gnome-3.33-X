@@ -3,14 +3,14 @@
 
 EAPI=6
 
-inherit gnome2 vala virtualx
+inherit gnome2 vala virtualx meson
 
 DESCRIPTION="A cheesy program to take pictures and videos from your webcam"
 HOMEPAGE="https://wiki.gnome.org/Apps/Cheese"
 
 LICENSE="GPL-2+"
 SLOT="0/8" # subslot = libcheese soname version
-IUSE="+introspection test"
+IUSE="+introspection doc test debug"
 KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 COMMON_DEPEND="
@@ -58,19 +58,19 @@ DEPEND="${COMMON_DEPEND}
 "
 
 src_prepare() {
-	vala_src_prepare
-	gnome2_src_prepare
+	default
+	addwrite /dev/dri/renderD129
+	addwrite /dev/dri/card0
+	addwrite /dev/dri/card1
 }
 
 src_configure() {
-	gnome2_src_configure \
-		GST_INSPECT=$(type -P true) \
-		$(use_enable introspection) \
-		--disable-lcov \
-		--disable-static
-}
-
-src_test() {
-	"${EROOT}${GLIB_COMPILE_SCHEMAS}" --allow-any-name "${S}/data" || die
-	GSETTINGS_SCHEMA_DIR="${S}/data" virtx emake check
+	local emesonargs=(
+		$(usex debug --buildtype=debug --buildtype=plain)
+		$(meson_use test tests)
+		$(meson_use introspection)
+		$(meson_use doc gtk_doc)
+		$(meson_use doc man)
+	)
+	meson_src_configure
 }

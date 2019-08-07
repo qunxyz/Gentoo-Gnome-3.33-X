@@ -45,6 +45,8 @@ RDEPEND="${COMMON_DEPEND}
 src_prepare() {
 	sed -i -e "s/meson.add_install_script('meson-post-install.py', libexecdir, bindir)//" "${S}"/meson.build || die "sed failed"
 	default
+	addwrite /dev/dri/renderD129
+	addwrite /dev/dri/card1
 }
 
 pkg_postinst() {
