@@ -40,10 +40,6 @@ DEPEND="${RDEPEND}
 	vala? ( $(vala_depend) )
 "
 
-PATCHES=(
-	"${FILESDIR}"/multilib-build.patch
-)
-
 src_prepare() {
 	default
 }
@@ -53,10 +49,10 @@ src_configure() {
 		local emesonargs=(
 			-Ddefault_library=shared
 			-Dtls_check=false
+			-Dgssapi=$(usex gssapi enabled disabled)
+			-Dvapi=$(usex vala enabled disabled)
+			-Dintrospection=$(usex introspection enabled disabled)
 			$(meson_use gnome)
-			$(meson_use gssapi)
-			$(meson_use introspection)
-			$(meson_use vala vapi)
 			$(meson_use doc)
 			$(meson_use test tests)
 			$(meson_use samba ntlm_auth '${EPREFIX}'/usr/bin/ntlm_auth)

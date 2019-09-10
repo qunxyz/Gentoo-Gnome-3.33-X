@@ -5,14 +5,14 @@ EAPI=6
 PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6,3_7} )
 PYTHON_REQ_USE="xml"
 
-inherit gnome2 python-single-r1 toolchain-funcs
+inherit gnome2 python-single-r1 toolchain-funcs meson
 
 DESCRIPTION="Introspection system for GObject-based libraries"
 HOMEPAGE="https://wiki.gnome.org/Projects/GObjectIntrospection"
 
 LICENSE="LGPL-2+ GPL-2+"
 SLOT="0"
-IUSE="cairo doctool test"
+IUSE="cairo doctool test debug"
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
 	test? ( cairo )
@@ -45,24 +45,16 @@ pkg_setup() {
 }
 
 src_configure() {
-	if ! has_version "x11-libs/cairo[glib]"; then
-		# Bug #391213: enable cairo-gobject support even if it's not installed
-		# We only PDEPEND on cairo to avoid circular dependencies
-		export CAIRO_LIBS="-lcairo -lcairo-gobject"
-		export CAIRO_CFLAGS="-I${EPREFIX}/usr/include/cairo"
-	fi
-
-	# To prevent crosscompiling problems, bug #414105
-	gnome2_src_configure \
-		--disable-static \
-		CC="$(tc-getCC)" \
-		YACC="$(type -p yacc)" \
-		$(use_with cairo) \
-		$(use_enable doctool)
+	local emesonargs=(
+		$(usex debug --buildtype=debug --buildtype=plain)
+		$(meson_use cairo)
+		$(meson_use doctool)
+	)
+	meson_src_configure
 }
 
 src_install() {
-	gnome2_src_install
+	meson_src_install
 	# Prevent collision with gobject-introspection-common
 	rm -v "${ED}"usr/share/aclocal/introspection.m4 \
 		"${ED}"usr/share/gobject-introspection-1.0/Makefile.introspection || die
